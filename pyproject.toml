@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "multigrid-helmholtz-solvers"
+version = "0.1.0"
+description = "Sparse finite differences, Gauss-Seidel, and multigrid V/W cycles for a manufactured 2D Helmholtz-type problem"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+dependencies = ["numpy>=1.24", "scipy>=1.10"]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+plots = ["matplotlib>=3.7"]
+all = ["pytest>=7", "matplotlib>=3.7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
