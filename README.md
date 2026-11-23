@@ -74,6 +74,44 @@ hierarchies at $N=16$ and $N=32$ include problematic coarse operators; see the
 
 ![Residual convergence and divergence at N=32 for c=-20](figures/residual_N32_cneg20.png)
 
+### Krylov acceleration for the indefinite case
+
+An additional [GMRES experiment](docs/krylov.md) investigates the
+indefinite problem with `c=-20`.
+
+The method applies restarted GMRES to the original indefinite system,
+using one zero-initialized multigrid V-cycle of an auxiliary
+positive-definite operator as a fixed preconditioner:
+
+- Original operator: `A = -Delta_h - 20I`
+- Auxiliary operator: `P = -Delta_h + 20I`
+- Preconditioner: one V-cycle approximating the inverse of `P`
+
+The true relative residual is evaluated against the original system.
+
+| Grid | Standalone three-grid V-cycle | GMRES alone | Shifted-MG-preconditioned GMRES |
+|---:|---|---|---|
+| 16 | Not converged | 105 Arnoldi steps | **17 Arnoldi steps** |
+| 32 | Not converged | Not converged | **17 Arnoldi steps** |
+| 64 | 11 cycles | Not converged | **17 Arnoldi steps** |
+
+All successful solves reached a true relative residual below `1e-8`.
+
+These comparisons use fixed iteration budgets. A multigrid cycle and
+a GMRES iteration have different computational costs, so the counts
+do not establish runtime speedups or general grid-independent convergence.
+
+Reproduce the experiment:
+
+```bash
+python experiments/gmres_indefinite.py --grids 16 32 64
+```
+
+The new implementation is in
+[`src/multigrid_helmholtz/krylov.py`](src/multigrid_helmholtz/krylov.py),
+with independent numerical tests in
+[`tests/test_krylov.py`](tests/test_krylov.py).
+
 ### Accuracy against the exact solution
 
 For the **sparse direct reference** at $c=20$, the maximum absolute errors are:
